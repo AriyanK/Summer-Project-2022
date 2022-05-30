@@ -10,6 +10,7 @@ public class PlayerController2D : MonoBehaviour
 
     bool isGrounded;
     bool isShooting;
+    bool isRunning;
     bool isFacingLeft;
 
     [SerializeField]
@@ -25,6 +26,12 @@ public class PlayerController2D : MonoBehaviour
     private float jumpSpeed = 5f;
     [SerializeField]
     private float shotDelay = .5f;
+
+    private float jumpTimeCounter;
+    [SerializeField]
+    private float jumpTime;
+    private bool isJumping;
+    
 
     [SerializeField]
     Transform bulletSpawnPos;
@@ -46,14 +53,19 @@ public class PlayerController2D : MonoBehaviour
           (Physics2D.Linecast(transform.position, groundCheckR.position, 1 << LayerMask.NameToLayer("Ground"))))
         {
             isGrounded = true;
+            bulletSpawnPos.transform.localPosition = new Vector2(bulletSpawnPos.transform.localPosition.x, 0.02f);
         }
         else{
             isGrounded = false;
-            animator.Play("player_jump");
+            if(!Input.GetKey("j")){
+                animator.Play("player_jump");
+                bulletSpawnPos.transform.localPosition = new Vector2(bulletSpawnPos.transform.localPosition.x, 0.05f);
+            }
         }
 
         if(Input.GetKey("d") || Input.GetKey("right")){
             rb2d.velocity = new Vector2(runSpeed, rb2d.velocity.y);
+            isRunning = true;
             isFacingLeft = false;
             bulletSpawnPos.transform.localPosition = new Vector2(0.16f, bulletSpawnPos.transform.localPosition.y);
             if(isGrounded){
@@ -67,6 +79,7 @@ public class PlayerController2D : MonoBehaviour
         }
         else if(Input.GetKey("a") || Input.GetKey("left")){
             rb2d.velocity = new Vector2(-runSpeed, rb2d.velocity.y);
+            isRunning = true;
             isFacingLeft = true;
             bulletSpawnPos.transform.localPosition = new Vector2(-0.16f, bulletSpawnPos.transform.localPosition.y);
             if(isGrounded){
@@ -80,20 +93,38 @@ public class PlayerController2D : MonoBehaviour
             }
         }
         else{
-            if(isGrounded && !isShooting)
+            if(isGrounded && !isShooting){
+                isRunning = false;
                 animator.Play("player_idle");
+            }
             rb2d.velocity = new Vector2(0, rb2d.velocity.y);
         }
 
-        if(Input.GetKey("space") && isGrounded){
-            rb2d.velocity = new Vector2(rb2d.velocity.x, jumpSpeed);
-            animator.Play("player_jump");
-        }
+        
     }
 
     private void Update(){
+        if(Input.GetKeyDown("space") && isGrounded){
+            rb2d.velocity = new Vector2(rb2d.velocity.x, jumpSpeed);
+            isJumping = true;
+            jumpTimeCounter = jumpTime;
+            animator.Play("player_jump");
+        }
+        if(Input.GetKey("space") && isJumping){
+            if(jumpTimeCounter > 0){
+                rb2d.velocity = new Vector2(rb2d.velocity.x, jumpSpeed);
+                jumpTimeCounter -= Time.deltaTime;
+            } else{
+                isJumping = false;
+            }
+            animator.Play("player_jump");
+        }
+        if(Input.GetKeyUp("space")){
+            isJumping = false;
+        }
+        
         //Idle Shooting
-        if(Input.GetKey("j") && isGrounded){
+        if(Input.GetKey("j") && isGrounded && !isRunning){
             if(isShooting) return;
             isShooting = true;
             animator.Play("player_idle_shoot");
@@ -103,10 +134,33 @@ public class PlayerController2D : MonoBehaviour
             b.transform.position = bulletSpawnPos.transform.position;
             Invoke("ResetShoot", shotDelay);
         }
+        else if(Input.GetKey("j") && isGrounded && isRunning){
+            if(isShooting) return;
+            isShooting = true;
+            animator.Play("player_run_shoot");
+            GameObject b = Instantiate(bullet);
+            b.GetComponent<BulletScript>().StartShoot(isFacingLeft);
+            b.transform.position = bulletSpawnPos.transform.position;
+            Invoke("ResetShoot", shotDelay);
+        }
+
+        //Jump Shooting
+        if(Input.GetKey("j") && !isGrounded){
+            if(isShooting) return;
+            isShooting = true;
+            animator.Play("player_jump_shoot");
+            GameObject b = Instantiate(bullet);
+            b.GetComponent<BulletScript>().StartShoot(isFacingLeft);
+            b.transform.position = bulletSpawnPos.transform.position;
+            Invoke("ResetShoot", shotDelay);
+        }
+
+
     }
 
     void ResetShoot(){
         isShooting = false;
+        isRunning = false;
         animator.Play("player_idle");
     }
 

@@ -22,4 +22,10 @@ public class BulletScript : MonoBehaviour
     void OnBecameInvisible(){
         Destroy(gameObject);
     }
+
+    void OnCollisionEnter(Collision collision){
+        if(collision.gameObject.tag == "Surface"){
+            Destroy(gameObject);
+        }
+    }
 }

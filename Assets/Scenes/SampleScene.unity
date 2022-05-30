@@ -252,7 +252,7 @@ GameObject:
   - component: {fileID: 638203298}
   m_Layer: 6
   m_Name: Platform
-  m_TagString: Untagged
+  m_TagString: Surface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -361,7 +361,7 @@ PlatformEffector2D:
   m_UseColliderMask: 1
   m_ColliderMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483647
   m_RotationalOffset: 0
   m_UseOneWay: 0
   m_UseOneWayGrouping: 0
@@ -544,8 +544,9 @@ MonoBehaviour:
   groundCheckL: {fileID: 1982423490}
   groundCheckR: {fileID: 18041246}
   runSpeed: 2
-  jumpSpeed: 6
+  jumpSpeed: 4
   shotDelay: 0.2
+  jumpTime: 0.2
   bulletSpawnPos: {fileID: 1734856343}
   bullet: {fileID: 7250069257341565921, guid: a2d37520f17d18f45a2d718eaec06882, type: 3}
 --- !u!1 &1252104119
@@ -707,7 +708,7 @@ GameObject:
   - component: {fileID: 1868068205}
   m_Layer: 6
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: Surface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
