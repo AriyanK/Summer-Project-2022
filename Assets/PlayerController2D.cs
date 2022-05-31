@@ -145,7 +145,7 @@ public class PlayerController2D : MonoBehaviour
         }
 
         //Jump Shooting
-        if(Input.GetKey("j") && !isGrounded){
+        if((Input.GetKey("j") && !isGrounded) || (Input.GetKey("j") && isJumping)){
             if(isShooting) return;
             isShooting = true;
             animator.Play("player_jump_shoot");
