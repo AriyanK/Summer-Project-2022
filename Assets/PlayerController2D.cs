@@ -30,7 +30,9 @@ public class PlayerController2D : MonoBehaviour
     private float jumpTimeCounter;
     [SerializeField]
     private float jumpTime;
+
     private bool isJumping;
+    private bool doubleJump = false;
     
 
     [SerializeField]
@@ -104,11 +106,20 @@ public class PlayerController2D : MonoBehaviour
     }
 
     private void Update(){
-        if(Input.GetKeyDown("space") && isGrounded){
+        Debug.Log("doubleJump value: " + doubleJump);
+
+        if((Input.GetKeyDown("space") && isGrounded) || !doubleJump && Input.GetKeyDown("space")){        //Jump and double jump
             rb2d.velocity = new Vector2(rb2d.velocity.x, jumpSpeed);
+            doubleJump = !doubleJump;
             isJumping = true;
             jumpTimeCounter = jumpTime;
             animator.Play("player_jump");
+        }
+        if(!doubleJump){            //If 
+            isJumping = true;
+        }
+        if(isGrounded){             //If grounded, reset double jump
+            doubleJump = false;
         }
         if(Input.GetKey("space") && isJumping){
             if(jumpTimeCounter > 0){
